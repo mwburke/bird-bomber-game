@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     private Vector3 targetPosition;
     private float moveTime;
 
-    private Vehicle targetVehicle = null;
+    private Target target = null;
 
     // Start is called before the first frame update
     void Start()
@@ -27,8 +27,8 @@ public class Projectile : MonoBehaviour
             transform.position = Vector3.Lerp(startPosition, targetPosition, moveTime / shootTime);
         } else {
             // Has reached target position
-            if (targetVehicle != null) {
-                targetVehicle.GetHit();
+            if (target != null) {
+                target.GetHit();
             }
             Destroy(this.gameObject);
         }
@@ -47,21 +47,21 @@ public class Projectile : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision) {
 
         GameObject parentGameObj = collision.transform.gameObject;
-        Vehicle vehicle = parentGameObj.GetComponent<Vehicle>();
+        Target hitTarget = parentGameObj.GetComponent<Target>();
 
-        if (vehicle != null) {
-            targetVehicle = vehicle;
+        if (hitTarget != null) {
+            target = hitTarget;
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision) {
 
         GameObject parentGameObj = collision.transform.gameObject;
-        Vehicle vehicle = parentGameObj.GetComponent<Vehicle>();
+        Target hitTarget = parentGameObj.GetComponent<Target>();
 
         // If the thing we left was a vehicle, then set our target vehicle to null
-        if (vehicle != null) {
-            targetVehicle = null;
+        if (hitTarget != null) {
+            target = null;
         }   
     }
 }

@@ -131,6 +131,8 @@ MonoBehaviour:
   turnSpeedModifier: 0.01
   maxHorizontalSpeed: 4
   frictionSpeed: 0
+  bonkTime: 0
+  bonkTimer: 0
   edgeLimitFraction: 0.025
   isActive: 1
 --- !u!114 &7885665825165030631
@@ -244,7 +246,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5861742561182135303}
   m_Layer: 0
-  m_Name: Target
+  m_Name: Reticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

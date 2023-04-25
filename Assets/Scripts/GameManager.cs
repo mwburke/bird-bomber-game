@@ -7,6 +7,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField]
     public static float scrollSpeed = 1.0f;
     public float maxVehicleSpawnTime;
     public float minVehicleSpawnTime;
@@ -52,13 +53,50 @@ public class GameManager : MonoBehaviour
 
     private void SpawnVehicle() {
         GameObject newVehiclePrefab = spawnableVehicles.GetRandom();
-        GameObject newVehicle = Instantiate(newVehiclePrefab, null);
 
-        newVehicle.transform.position = new Vector3(Random.Range(-1f, 1f) * maxSpawnRangeX, spawnPositionY, 0);
-        newVehicle.GetComponent<Vehicle>().OnVehicleHit += GameManager_OnVehicleHit;
+        float zAngle = Random.Range(0f, 360f);
+        Vector3 moveDirection = RandomCardinalDirection();
+
+        GameObject newVehicle = Instantiate(newVehiclePrefab,
+            new Vector3(Random.Range(-1f, 1f) * maxSpawnRangeX, spawnPositionY, 0),
+            QuarternionFromDirection(moveDirection)
+        );
+
+        Target target = newVehicle.GetComponent<Target>();
+        target.SetMoveDirection(moveDirection);
+        target.OnTargetHit += GameManager_OnTargetHit;
+
 
         UpdateNextVehicleSpawnTime();
 
+    }
+
+    private Vector3 RandomCardinalDirection() {
+        float value = Random.Range(0, 1f);
+        if (value < 0.25f) {
+            return Vector3.left;
+        } else if (value < 0.5f) {
+            return Vector3.up;
+        } else if (value < 0.75f) {
+            return Vector3.right;
+        } else {
+            return Vector3.down;
+        }
+    }
+
+    private Quaternion QuarternionFromDirection(Vector3 direction) {
+        if (direction == Vector3.left) {
+            return Quaternion.Euler(0, 0, 180);
+        } else if (direction == Vector3.up) {
+            return Quaternion.Euler(0, 0, 90);
+        } else if (direction == Vector3.right) {
+            return Quaternion.Euler(0, 0, 0);
+        } else if (direction == Vector3.down) {
+            return Quaternion.Euler(0, 0, 270);
+        } else {
+            // Shouldn't be used
+            return Quaternion.Euler(0, 0, 0);
+        }
     }
 
     private void ResetScore() {
@@ -73,9 +111,8 @@ public class GameManager : MonoBehaviour
         scoreText.SetText("Score: " + score.ToString());
     }
 
-    public void GameManager_OnVehicleHit(Vehicle vehicle) {
-        Debug.Log("gm vehiclehit");
-        AddVehicleScore(vehicle.scoreValue);
+    public void GameManager_OnTargetHit(Target target) {
+        AddVehicleScore(target.scoreValue);
         UpdateScoreText();
     }
 }

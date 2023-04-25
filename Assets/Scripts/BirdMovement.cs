@@ -11,6 +11,8 @@ public class BirdMovement : MonoBehaviour
     private float horizontalSpeed;
     public float maxHorizontalSpeed;
     public float frictionSpeed;
+    public float bonkTime;
+    public float bonkTimer;
 
     // Movement edge handling
     public float edgeLimitFraction;
@@ -22,6 +24,7 @@ public class BirdMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        isActive = true;
         horizontalSpeed = 0f;
         SetEdgeLimits();
     }
