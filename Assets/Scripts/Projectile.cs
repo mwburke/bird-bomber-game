@@ -12,6 +12,10 @@ public class Projectile : MonoBehaviour
 
     private Target target = null;
 
+    // Events
+    public delegate void OnProjectileLandDelegate(Target target);
+    public event OnProjectileLandDelegate OnProjectileLand;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +34,9 @@ public class Projectile : MonoBehaviour
             if (target != null) {
                 target.GetHit();
             }
+
+            // Fire off event here with target if there is one
+            OnProjectileLand?.Invoke(target);
             Destroy(this.gameObject);
         }
     }

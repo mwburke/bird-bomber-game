@@ -11,15 +11,18 @@ public class BirdMovement : MonoBehaviour
     private float horizontalSpeed;
     public float maxHorizontalSpeed;
     public float frictionSpeed;
-    public float bonkTime;
-    public float bonkTimer;
+    
 
     // Movement edge handling
     public float edgeLimitFraction;
     private float edgeLimitLeft, edgeLimitRight;
 
-    // Game activity
+    // Obstacle
     public bool isActive;
+    public float obstacleHitTime;
+    private float obstacleHitTimer;
+    private float speedAtObstacleHit;
+
 
     // Start is called before the first frame update
     void Start()
@@ -34,8 +37,27 @@ public class BirdMovement : MonoBehaviour
     {
         if (isActive) {
             ProcessMovement();
-            ProcessAngle();
+        } else {
+            // Ran into obstacle
+            obstacleHitTimer += Time.deltaTime;
+            if (obstacleHitTimer >= obstacleHitTime) {
+                isActive = true;
+            } else {
+                if (horizontalSpeed < 0) {
+                    horizontalSpeed += speedAtObstacleHit / obstacleHitTime * Time.deltaTime;
+                } else {
+                    horizontalSpeed -= speedAtObstacleHit / obstacleHitTime * Time.deltaTime;
+                }
+            }
         }
+        ProcessAngle();
+    }
+
+    public void ObstacleCollision() {
+        // TODO: animation, highlight?
+        obstacleHitTimer = 0f;
+        speedAtObstacleHit = Mathf.Abs(horizontalSpeed);
+        isActive = false;
     }
 
     private void ProcessAngle() {

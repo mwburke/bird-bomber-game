@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BirdAttacking : MonoBehaviour
 {
+    public GameManager gameManager;
     public GameObject projectilePrefab;
     public GameObject target;
     public GameObject shootTimerBar;
@@ -11,7 +12,8 @@ public class BirdAttacking : MonoBehaviour
 
     // Shooting
     public float shootDistance;
-    public float basicShootDelay;
+    public float defaultBasicShootDelay;
+    private float basicShootDelay;
     private float basicShootTimer;
 
     private float maxTimerBarXScale = 30;
@@ -20,6 +22,7 @@ public class BirdAttacking : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        basicShootDelay = defaultBasicShootDelay;
         basicShootTimer = 0f;
         target.transform.localPosition = new Vector3(0, shootDistance, 0);
     }
@@ -50,6 +53,8 @@ public class BirdAttacking : MonoBehaviour
 
         projectile.SetStartPosition(transform.position);
         projectile.SetTargetPosition(GetTargetPosition(target.transform.position));
+
+        projectile.OnProjectileLand += gameManager.GameManager_OnProjectileLand;
     }
 
     private Vector3 GetTargetPosition(Vector3 originalTargetPosition) {

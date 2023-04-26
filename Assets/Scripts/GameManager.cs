@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 using TMPro;
-
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,14 +18,25 @@ public class GameManager : MonoBehaviour
     private float maxSpawnRangeX;
     private float spawnPositionY;
     private int score;
-    private float scoreMultiplier;
+    
     public TMPro.TextMeshProUGUI scoreText;
+
+    // powerups
+    public int consecutiveHitsToPowerup;
+    private int numConsecutiveHits;
+    public GameObject[] spawnablePowerups;
+    public Image powerupBarImage;
+    
+
+    private float scoreMultiplier;
 
     // Start is called before the first frame update
     void Start()
     {
         ResetScore();
+
         scoreMultiplier = 1f;
+        numConsecutiveHits = 0;
 
         cam = Camera.main;
 
@@ -54,7 +65,6 @@ public class GameManager : MonoBehaviour
     private void SpawnVehicle() {
         GameObject newVehiclePrefab = spawnableVehicles.GetRandom();
 
-        float zAngle = Random.Range(0f, 360f);
         Vector3 moveDirection = RandomCardinalDirection();
 
         GameObject newVehicle = Instantiate(newVehiclePrefab,
@@ -64,8 +74,6 @@ public class GameManager : MonoBehaviour
 
         Target target = newVehicle.GetComponent<Target>();
         target.SetMoveDirection(moveDirection);
-        target.OnTargetHit += GameManager_OnTargetHit;
-
 
         UpdateNextVehicleSpawnTime();
 
@@ -111,8 +119,34 @@ public class GameManager : MonoBehaviour
         scoreText.SetText("Score: " + score.ToString());
     }
 
-    public void GameManager_OnTargetHit(Target target) {
-        AddVehicleScore(target.scoreValue);
-        UpdateScoreText();
+    public void GameManager_OnProjectileLand(Target target) {
+        if (target != null) {
+            AddVehicleScore(target.scoreValue);
+            UpdateScoreText();
+            numConsecutiveHits += 1;
+        } else {
+            numConsecutiveHits = 0;
+        }
+        UpdateConsecutiveHits();
     }
+
+    private void UpdateConsecutiveHits() {
+        // Figure out how to make it fill up, and then reset
+        if (numConsecutiveHits == consecutiveHitsToPowerup) {
+            numConsecutiveHits = 0;
+            SpawnPowerup();
+        }
+        UpdatePowerupBarVisual();
+    }
+
+    private void SpawnPowerup() {
+        GameObject powerupPrefab = spawnablePowerups.GetRandom();
+        GameObject newPowerup = Instantiate(powerupPrefab);
+        newPowerup.transform.position = new Vector3(Random.Range(-1f, 1f) * maxSpawnRangeX, spawnPositionY, 0);
+    }
+
+    private void UpdatePowerupBarVisual() {
+        powerupBarImage.fillAmount = (float)numConsecutiveHits / (consecutiveHitsToPowerup - 1);
+    }
+
 }

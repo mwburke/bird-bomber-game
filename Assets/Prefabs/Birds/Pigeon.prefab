@@ -131,10 +131,9 @@ MonoBehaviour:
   turnSpeedModifier: 0.01
   maxHorizontalSpeed: 4
   frictionSpeed: 0
-  bonkTime: 0
-  bonkTimer: 0
   edgeLimitFraction: 0.025
   isActive: 1
+  obstacleHitTime: 1
 --- !u!114 &7885665825165030631
 MonoBehaviour:
   m_ObjectHideFlags: 0
