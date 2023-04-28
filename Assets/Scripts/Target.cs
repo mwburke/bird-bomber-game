@@ -45,6 +45,11 @@ public class Target : MonoBehaviour
         }
     }
 
+    public bool HasBeenHit() {
+        return hasBeenHit;
+    }
+        
+
     public void SetBlockedStatus(bool status) {
         isBlocked = status;
     }

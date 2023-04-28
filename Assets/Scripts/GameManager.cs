@@ -18,16 +18,10 @@ public class GameManager : MonoBehaviour
     private float maxSpawnRangeX;
     private float spawnPositionY;
     private int score;
-    
-    public TMPro.TextMeshProUGUI scoreText;
-
-    // powerups
-    public int consecutiveHitsToPowerup;
-    private int numConsecutiveHits;
-    public GameObject[] spawnablePowerups;
-    public Image powerupBarImage;
-    
-
+    public TextMeshProUGUI scoreText;
+    public GameObject powerupManagerObj;
+    private PowerupManager powerupManager;
+    private float defaultScoreMultiplier = 1f;
     private float scoreMultiplier;
 
     // Start is called before the first frame update
@@ -35,8 +29,9 @@ public class GameManager : MonoBehaviour
     {
         ResetScore();
 
+        powerupManager = powerupManagerObj.GetComponent<PowerupManager>();
+
         scoreMultiplier = 1f;
-        numConsecutiveHits = 0;
 
         cam = Camera.main;
 
@@ -76,7 +71,6 @@ public class GameManager : MonoBehaviour
         target.SetMoveDirection(moveDirection);
 
         UpdateNextVehicleSpawnTime();
-
     }
 
     private Vector3 RandomCardinalDirection() {
@@ -123,30 +117,14 @@ public class GameManager : MonoBehaviour
         if (target != null) {
             AddVehicleScore(target.scoreValue);
             UpdateScoreText();
-            numConsecutiveHits += 1;
-        } else {
-            numConsecutiveHits = 0;
         }
-        UpdateConsecutiveHits();
     }
 
-    private void UpdateConsecutiveHits() {
-        // Figure out how to make it fill up, and then reset
-        if (numConsecutiveHits == consecutiveHitsToPowerup) {
-            numConsecutiveHits = 0;
-            SpawnPowerup();
-        }
-        UpdatePowerupBarVisual();
+    public void ResetScoreMultiplier() {
+        scoreMultiplier = defaultScoreMultiplier;
     }
 
-    private void SpawnPowerup() {
-        GameObject powerupPrefab = spawnablePowerups.GetRandom();
-        GameObject newPowerup = Instantiate(powerupPrefab);
-        newPowerup.transform.position = new Vector3(Random.Range(-1f, 1f) * maxSpawnRangeX, spawnPositionY, 0);
+    public void SetScoreMultiplier(float multiplier) {
+        scoreMultiplier = multiplier;
     }
-
-    private void UpdatePowerupBarVisual() {
-        powerupBarImage.fillAmount = (float)numConsecutiveHits / (consecutiveHitsToPowerup - 1);
-    }
-
 }

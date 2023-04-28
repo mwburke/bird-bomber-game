@@ -22,12 +22,15 @@ public class BirdMovement : MonoBehaviour
     public float obstacleHitTime;
     private float obstacleHitTimer;
     private float speedAtObstacleHit;
+    private bool hasShield;
+    public SpriteRenderer shieldVisual;
 
 
     // Start is called before the first frame update
     void Start()
     {
         isActive = true;
+        hasShield = false;
         horizontalSpeed = 0f;
         SetEdgeLimits();
     }
@@ -53,11 +56,21 @@ public class BirdMovement : MonoBehaviour
         ProcessAngle();
     }
 
+    public void AddShield() {
+        hasShield = true;
+        shieldVisual.enabled = true;
+    }
+
     public void ObstacleCollision() {
-        // TODO: animation, highlight?
-        obstacleHitTimer = 0f;
-        speedAtObstacleHit = Mathf.Abs(horizontalSpeed);
-        isActive = false;
+        // TODO: animation
+        if (!hasShield) {
+            obstacleHitTimer = 0f;
+            speedAtObstacleHit = Mathf.Abs(horizontalSpeed);
+            isActive = false;
+        } else {
+            hasShield = false;
+            shieldVisual.enabled = false;
+        }
     }
 
     private void ProcessAngle() {
