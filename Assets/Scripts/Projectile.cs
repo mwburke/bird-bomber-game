@@ -9,11 +9,12 @@ public class Projectile : MonoBehaviour
     private Vector3 startPosition;
     private Vector3 targetPosition;
     private float moveTime;
+    private bool excludeFromConsecutiveHits;
 
     private Target target = null;
 
     // Events
-    public delegate void OnProjectileLandDelegate(Target target);
+    public delegate void OnProjectileLandDelegate(Target target, bool wasAlreadyHit, bool excludeFromConsecutiveHits);
     public event OnProjectileLandDelegate OnProjectileLand;
 
     // Start is called before the first frame update
@@ -31,14 +32,20 @@ public class Projectile : MonoBehaviour
             transform.position = Vector3.Lerp(startPosition, targetPosition, moveTime / shootTime);
         } else {
             // Has reached target position
+            bool wasAlreadyHit = false;
             if (target != null) {
+                wasAlreadyHit = target.HasBeenHit();
                 target.GetHit();
             }
 
             // Fire off event here with target if there is one
-            OnProjectileLand?.Invoke(target);
+            OnProjectileLand?.Invoke(target, wasAlreadyHit, excludeFromConsecutiveHits);
             Destroy(this.gameObject);
         }
+    }
+
+    public void SetConsecutiveHitExcludeStatus(bool status) {
+        excludeFromConsecutiveHits = status;
     }
 
     public void SetStartPosition(Vector3 startPosition) {

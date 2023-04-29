@@ -77,8 +77,9 @@ public class BirdAttacking : MonoBehaviour
         projectile.SetStartPosition(transform.position);
         projectile.SetTargetPosition(GetTargetPosition(target.transform.position));
 
+        projectile.SetConsecutiveHitExcludeStatus(false);
+
         projectile.OnProjectileLand += gameManager.GameManager_OnProjectileLand;
-        projectile.OnProjectileLand += powerupManager.PowerupManager_OnProjectileLand;
 
         if (activeMultiShot) {
             GameObject projectileObjLeft = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
@@ -87,8 +88,9 @@ public class BirdAttacking : MonoBehaviour
             projectileLeft.SetStartPosition(transform.position);
             projectileLeft.SetTargetPosition(targetPosition + new Vector3(-yDiff * Mathf.Cos(multishotAngle), 0, 0));
 
+            projectileLeft.SetConsecutiveHitExcludeStatus(true);
+
             projectileLeft.OnProjectileLand += gameManager.GameManager_OnProjectileLand;
-            projectileLeft.OnProjectileLand += powerupManager.PowerupManager_OnProjectileLand;
 
             GameObject projectileObjRight = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
             Projectile projectileRight = projectileObjRight.GetComponent<Projectile>();
@@ -96,10 +98,10 @@ public class BirdAttacking : MonoBehaviour
             projectileRight.SetStartPosition(transform.position);
             projectileRight.SetTargetPosition(targetPosition + new Vector3(yDiff * Mathf.Cos(multishotAngle), 0, 0));
 
-            projectileRight.OnProjectileLand += gameManager.GameManager_OnProjectileLand;
-            projectileRight.OnProjectileLand += powerupManager.PowerupManager_OnProjectileLand;
-        }
+            projectileRight.SetConsecutiveHitExcludeStatus(true);
 
+            projectileRight.OnProjectileLand += gameManager.GameManager_OnProjectileLand;
+        }
     }
 
     private Vector3 GetTargetPosition(Vector3 originalTargetPosition) {

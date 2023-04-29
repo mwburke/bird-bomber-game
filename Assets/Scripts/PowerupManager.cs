@@ -5,17 +5,12 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class PowerupManager : MonoBehaviour
-{
+public class PowerupManager : MonoBehaviour {
 
     public GameManager gameManager;
     public GameObject bird;
     private BirdAttacking birdAttacking;
     private BirdMovement birdMovement;
-
-    public SpriteRenderer scoreMultiplierSprite;
-    public float scoreMultiplierTime;
-    private readonly float scoreMultiplier = 2f;
 
     public SpriteRenderer multiShotSprite;
     public float multiShotTime;
@@ -23,41 +18,39 @@ public class PowerupManager : MonoBehaviour
     public SpriteRenderer fastShotSprite;
     public float fastShotTime;
     public float fastShotDelay;
-    
-    
-    public int consecutiveHitsToPowerup;
-    private int numConsecutiveHits;
-    public Image powerupBarImage;
 
-    private Powerup[] powerups = new Powerup[3];
+    private Powerup[] powerups = new Powerup[2];
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         birdAttacking = bird.GetComponent<BirdAttacking>();
         birdMovement = bird.GetComponent<BirdMovement>();
-
-        numConsecutiveHits = 0;
 
         InitializePowerups();
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         ProcessPowerups();
     }
 
     private void InitializePowerups() {
-        powerups[0] = new ScoreMultiplierPowerup(scoreMultiplierTime, scoreMultiplier, gameManager, scoreMultiplierSprite);
-        powerups[1] = new MultiShotPowerup(multiShotTime, birdAttacking, multiShotSprite); 
-        powerups[2] = new FastShootPowerup(fastShotTime, fastShotDelay, birdAttacking, fastShotSprite);
+        powerups[0] = new MultiShotPowerup(multiShotTime, birdAttacking, multiShotSprite);
+        powerups[1] = new FastShootPowerup(fastShotTime, fastShotDelay, birdAttacking, fastShotSprite);
     }
 
     public void ProcessPowerups() {
         foreach (Powerup powerup in powerups) {
             powerup.ProcessUpdate(Time.deltaTime);
         }
+    }
+
+    public void ActivateMultiShot() {
+        powerups[0].ActivatePowerup();
+    }
+
+    public void ActivateFastShoot() {
+        powerups[1].ActivatePowerup();
     }
 
 
@@ -81,25 +74,4 @@ public class PowerupManager : MonoBehaviour
         return unusedPowerups.ToArray();
     }
 
-    public void PowerupManager_OnProjectileLand(Target target) {
-        if ((target != null) & (!target.HasBeenHit())) {
-            numConsecutiveHits += 1;
-        } else {
-            numConsecutiveHits = 0;
-        }
-        UpdateConsecutiveHits();
-    }
-
-    private void UpdateConsecutiveHits() {
-        // Figure out how to make it fill up, and then reset
-        if (numConsecutiveHits == consecutiveHitsToPowerup) {
-            numConsecutiveHits = 0;
-            ActivateRandomPowerup();
-        }
-        UpdatePowerupBarVisual();
-    }
-
-    private void UpdatePowerupBarVisual() {
-        powerupBarImage.fillAmount = (float)numConsecutiveHits / (consecutiveHitsToPowerup - 1);
-    }
 }

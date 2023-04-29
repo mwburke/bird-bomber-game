@@ -8,12 +8,20 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
-    public static float scrollSpeed = 1.0f;
+    public static float scrollSpeed = 1.3f;
     public float maxVehicleSpawnTime;
     public float minVehicleSpawnTime;
     private float nextVehicleSpawnTime;
     private float vehicleSpawnTimer;
     public GameObject[] spawnableVehicles;
+
+    public float maxPowerupSpawnTime;
+    public float minPowerupSpawnTime;
+    private float nextPowerupSpawnTime;
+    private float powerupSpawnTimer;
+    public GameObject powerupContainer;
+    public GameObject[] spawnablePowerupObjs;
+
     private Camera cam;
     private float maxSpawnRangeX;
     private float spawnPositionY;
@@ -24,14 +32,22 @@ public class GameManager : MonoBehaviour
     private float defaultScoreMultiplier = 1f;
     private float scoreMultiplier;
 
+    public int consecutiveHitsToPowerup;
+    private int numConsecutiveHits;
+    public Image scoreMultiplierBar;
+    public TextMeshProUGUI scoreMultiplierText;
+
+
     // Start is called before the first frame update
     void Start()
     {
         ResetScore();
 
+        numConsecutiveHits = 0;
+
         powerupManager = powerupManagerObj.GetComponent<PowerupManager>();
 
-        scoreMultiplier = 1f;
+        scoreMultiplier = defaultScoreMultiplier;
 
         cam = Camera.main;
 
@@ -39,6 +55,7 @@ public class GameManager : MonoBehaviour
         spawnPositionY = cam.orthographicSize * 1.1f;
 
         SpawnVehicle();
+        UpdateNextPowerupSpawnTime();
     }
 
     // Update is called once per frame
@@ -50,6 +67,17 @@ public class GameManager : MonoBehaviour
         }
 
         vehicleSpawnTimer += Time.deltaTime;
+
+        if (powerupSpawnTimer > nextPowerupSpawnTime) {
+            SpawnPowerup();
+        }
+
+        powerupSpawnTimer += Time.deltaTime;
+    }
+
+    private void UpdateNextPowerupSpawnTime() {
+        nextPowerupSpawnTime = Random.Range(minPowerupSpawnTime, maxPowerupSpawnTime);
+        powerupSpawnTimer = 0f;
     }
 
     public void UpdateNextVehicleSpawnTime() {
@@ -71,6 +99,18 @@ public class GameManager : MonoBehaviour
         target.SetMoveDirection(moveDirection);
 
         UpdateNextVehicleSpawnTime();
+    }
+
+    private void SpawnPowerup() {
+        GameObject newPowerupObj = spawnablePowerupObjs.GetRandom();
+
+        GameObject newPowerup = Instantiate(newPowerupObj);
+        newPowerup.transform.position = new Vector3(Random.Range(-1f, 1f) * maxSpawnRangeX, spawnPositionY, 0);
+
+        PowerupObj powerup = newPowerup.GetComponent<PowerupObj>();
+        powerup.SetMovable();
+
+        UpdateNextPowerupSpawnTime();
     }
 
     private Vector3 RandomCardinalDirection() {
@@ -105,19 +145,28 @@ public class GameManager : MonoBehaviour
         score = 0;
     }
 
-    private void AddVehicleScore(float vehicleScore) {
-        score += (int)(vehicleScore * scoreMultiplier);
+    private void AddTargetScore(float targetScore) {
+        score += (int)(targetScore * scoreMultiplier);
     }
 
     private void UpdateScoreText() {
         scoreText.SetText("Score: " + score.ToString());
     }
 
-    public void GameManager_OnProjectileLand(Target target) {
-        if (target != null) {
-            AddVehicleScore(target.scoreValue);
+    public void GameManager_OnProjectileLand(Target target, bool wasAlreadyHit, bool excludeFromConsecutiveHits) {
+        if ((target != null) & (!wasAlreadyHit)) {
+            AddTargetScore(target.scoreValue);
             UpdateScoreText();
+            numConsecutiveHits += 1;
+        } else {
+            if (!excludeFromConsecutiveHits) {
+                numConsecutiveHits = 0;
+                ResetScoreMultiplier();
+            }
         }
+
+        UpdateConsecutiveHits();
+        UpdateScoreMultiplierText();
     }
 
     public void ResetScoreMultiplier() {
@@ -126,5 +175,25 @@ public class GameManager : MonoBehaviour
 
     public void SetScoreMultiplier(float multiplier) {
         scoreMultiplier = multiplier;
+    }
+
+    private void UpdateConsecutiveHits() {
+        // Figure out how to make it fill up, and then reset
+        if (numConsecutiveHits == consecutiveHitsToPowerup) {
+            numConsecutiveHits = 0;
+
+            scoreMultiplier += 1;
+        }
+        UpdateScoreMultiplierBarVisual();
+        UpdateScoreMultiplierText();
+    }
+
+
+    private void UpdateScoreMultiplierText() {
+        scoreMultiplierText.text = "MULTIPLIER: X" + ((int)scoreMultiplier).ToString();
+    }
+
+    private void UpdateScoreMultiplierBarVisual() {
+        scoreMultiplierBar.fillAmount = (float)numConsecutiveHits / (consecutiveHitsToPowerup - 1);
     }
 }

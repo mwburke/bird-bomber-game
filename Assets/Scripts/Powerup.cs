@@ -8,6 +8,7 @@ public abstract class Powerup {
     protected float powerupTime;
     protected float powerupTimer;
     protected SpriteRenderer powerupVisual;
+    protected float lowerOpacity = 0.2f;
 
     protected Powerup() {
         powerupTimer = powerupTime;
@@ -35,37 +36,6 @@ public abstract class Powerup {
     abstract public void DeactivatePowerup();
 }
 
-
-public class ScoreMultiplierPowerup : Powerup {
-
-    private GameManager gameManager;
-    private float scoreMultiplier;
-    
-    public ScoreMultiplierPowerup(float powerupTime, float scoreMultiplier, GameManager gameManager, SpriteRenderer powerupVisual) : base() {
-        name = "score multiplier";
-        this.powerupTime = powerupTime;
-        this.scoreMultiplier = scoreMultiplier;
-        this.gameManager = gameManager;
-        this.powerupVisual = powerupVisual;
-        ResetTimer();
-    }
-
-    override public bool IsActive() {
-        return powerupTimer < powerupTime;
-    }
-
-    override public void ActivatePowerup() {
-        ResetTimer();
-        powerupVisual.enabled = true;
-        gameManager.SetScoreMultiplier(scoreMultiplier);
-    }
-
-    public override void DeactivatePowerup() {
-        powerupVisual.enabled = false;
-        gameManager.ResetScoreMultiplier();
-    }
-}
-
 public class FastShootPowerup : Powerup {
 
     private BirdAttacking birdAttacking;
@@ -76,8 +46,6 @@ public class FastShootPowerup : Powerup {
         this.shootDelay = shootDelay;
         this.birdAttacking = birdAttacking;
         this.powerupVisual = powerupVisual;
-
-        ResetTimer();
     }
 
     override public bool IsActive() {
@@ -85,13 +53,13 @@ public class FastShootPowerup : Powerup {
     }
 
     override public void ActivatePowerup() {
-        powerupVisual.enabled = true;
+        powerupVisual.color = new Color(1f, 1f, 1f, 1f);
         birdAttacking.SetBasicShootDelay(shootDelay);
         ResetTimer();
     }
 
     public override void DeactivatePowerup() {
-        powerupVisual.enabled = false;
+        powerupVisual.color = new Color(1f, 1f, 1f, lowerOpacity);
         birdAttacking.ResetBasicShootDelay();
     }
 }
@@ -112,13 +80,13 @@ public class MultiShotPowerup : Powerup {
     }
 
     override public void ActivatePowerup() {
-        powerupVisual.enabled = true;
+        powerupVisual.color = new Color(1f, 1f, 1f, 1f);
         birdAttacking.ActivateMultiShot();
         ResetTimer();
     }
 
     public override void DeactivatePowerup() {
-        powerupVisual.enabled = false;
+        powerupVisual.color = new Color(1f, 1f, 1f, lowerOpacity);
         birdAttacking.DeactivateMultiShot();
     }
 }

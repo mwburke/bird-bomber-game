@@ -12,6 +12,7 @@ public class Target : MonoBehaviour
     private bool isBlocked;
     private Vector3 moveDirection;
 
+    // These are unused, remove?`
     public event OnTargetHitDelegate OnTargetHit;
     public delegate void OnTargetHitDelegate(Target target);
 
