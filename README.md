@@ -1,1 +1,1 @@
-WIP version of a game I wanted to make. I'm pursuing it further in godot at my [crapshoot](https://github.com/mwburke/crapshoot repo to learn another game engine as well as work on finishing it up and adding polish.
+WIP version of a game I wanted to make. I'm pursuing it further in godot at my [crapshoot](https://github.com/mwburke/crapshoot) repo to learn another game engine as well as work on finishing it up and adding polish.
